@@ -1,0 +1,4 @@
+enum ButtonType{
+  positive,
+  negative
+}

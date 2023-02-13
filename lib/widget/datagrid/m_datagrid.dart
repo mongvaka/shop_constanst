@@ -1,34 +1,57 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:easy_localization/src/public_ext.dart';
+import 'package:shop_constanst/shared/model/basic_search.dart';
 import 'package:shop_constanst/widget/datagrid/m_button_delete.dart';
 import 'package:shop_constanst/widget/datagrid/m_button_edit.dart';
 import 'package:shop_constanst/widget/datagrid/m_button_view.dart';
+import 'package:shop_constanst/widget/datagrid/m_paginate.dart';
 import '../../shared/constanst/enum.dart';
 import '../button/m_button.dart';
 import '../button/m_button_action.dart';
 import '../input/m_input.dart';
 import 'm_body_cell.dart';
+import 'm_header_cell.dart';
 
-class DataGrid extends StatelessWidget {
-  TextEditingController searchController = TextEditingController();
+class DataGrid extends StatefulWidget {
   final  Function onCreate;
-  final  Function onDelete;
   final Row header;
-  final List<Container>  body ;
-  DataGrid({Key? key,required this.onCreate,required this.onDelete,required this.header,required this.body}) : super(key: key);
+  final  Future<dynamic>  url ;
+  final Function(dynamic) row;
+  final Function(BasicSearchModel) onsearch;
+  final String title;
+  final BasicSearchModel searchModel;
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  DataGrid({Key? key,required this.onCreate,required this.header, required this.url, required this.row, required this.onsearch, required this.searchModel, required this.title}) : super(key: key){
+    print('searModelInit${searchModel.page==''}');
+  }
+
+  @override
+  State<DataGrid> createState() => _DataGridState();
+}
+
+class _DataGridState extends State<DataGrid> {
+  TextEditingController searchController = TextEditingController();
+
+  String? totalPage = '1';
+
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
 
     return Container(
         child: ListView(
+
           children: [
             Row(
               children: [
                 SizedBox(width: 40,),
                 Container(
                   padding: EdgeInsets.only(top: 40),
-                  child: Text('CATEGORIES',
+                  child: Text(widget.title,
                     style: TextStyle(color: Colors.grey,fontSize: 14,fontWeight: FontWeight.w700,),
                   ),
                 ),
@@ -36,13 +59,16 @@ class DataGrid extends StatelessWidget {
                 Container(
                   width: 250,
                   child: MInput(
-                    controller: searchController,
+                    controller: widget.searchModel.cText,
                     hintText: 'SEARCH',
                     height:40,
                     mandatory: true,
                     prefixIcon: FontAwesomeIcons.search,
                     key: const Key('PASSWORD'),
-                    onChange: (){
+                    suffixIcon: FontAwesomeIcons.angleRight,
+                    onChange: (value,formKey){
+                      print('change');
+                      widget.onsearch(widget.searchModel);
                     } ,
                   ),
                 ),
@@ -51,7 +77,7 @@ class DataGrid extends StatelessWidget {
                     width: 100,
                     child: MButton(
                       onPress: (){
-                            onCreate();
+                            widget.onCreate();
                       },
                       text: 'CREATE',
                       type: ButtonType.positive,
@@ -61,7 +87,6 @@ class DataGrid extends StatelessWidget {
               ],
             ),
             Container(
-
               margin: EdgeInsets.all(40),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
@@ -71,147 +96,50 @@ class DataGrid extends StatelessWidget {
                   style: BorderStyle.solid,
                 ),
                 color: Colors.grey.shade50,
-
               ),
-              child: Container(
-                height: 650,
-                width:double.infinity,
-                child: Column(
+              child: IntrinsicHeight(
+
+                child:Column(
 
                   children: [
-                    header,
-                    ...body,
+                    Row(children: [
+                      ...widget.header.children,
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                            padding: const EdgeInsets.only(top: 7,bottom: 7),
+                            decoration: BoxDecoration(
+                              border: Border(
+                                right: BorderSide(width: 1.0, color: Colors.grey.shade200),
+                                bottom: BorderSide(width: 1.0, color: Colors.grey.shade200),
+                              ),
+
+                            ),
+                            alignment: Alignment.center,
+                            child: Text('ACTION')),
+                      )
+                    ],),
+                    FutureBuilder(
+                        builder: (BuildContext context, AsyncSnapshot<dynamic> snaphot){
+                          if(snaphot.hasData) {
+                            widget.searchModel.page = '${snaphot.data.currentPage }';
+                            totalPage = '${snaphot.data.totalPage}';
+                            dynamic result = snaphot.data.data.map((data){
+                             return widget.row(data);
+                            }
+                            );
+                            return Column( children: [...result],);
+                          }
+                          return CircularProgressIndicator();
+                        },
+                        future: widget.url),
                     Spacer(),
-                    Container(
-                      height: 80,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          top: BorderSide(width: 1.0, color: Colors.grey.shade200),
-                        ),
-                      ),
-                      alignment: Alignment.center,
-                      child:Row(
-                        children: [
-                          Spacer(),
-                          Container(
-                            width: 25,
-                            height: 25,
-                            margin: EdgeInsets.only(left: 5,right: 5),
-                            padding: EdgeInsets.only(top: 2),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: Colors.grey.shade200,
-                                width: 1,
-                                style: BorderStyle.solid,
-                              ),
-                              color: Colors.grey.shade50,
-                            ),
-                            child: Row(
-                              children: [
-                                Spacer(),
-                                Icon(FontAwesomeIcons.angleLeft,size: 14,color: Colors.grey,),
-                                Spacer()
-                              ],
-                            ),
+                    Paginate(onPaginate: (page){
+                      widget.searchModel.page = page;
+                      widget.searchModel.cPage.text = page;
+                      widget.onsearch(widget.searchModel);
 
-                          ),
-                          Container(
-                            width: 25,
-                            height: 25,
-                            margin: EdgeInsets.only(left: 5,right: 5),
-                            padding: EdgeInsets.only(top: 2),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: Colors.grey.shade200,
-                                width: 1,
-                                style: BorderStyle.solid,
-                              ),
-                              color: Colors.grey.shade50,
-                            ),
-                            child: Row(
-                              children: [
-                                Spacer(),
-                                Text('1',style: TextStyle(color: Colors.grey,fontWeight: FontWeight.w400,fontSize:14),),
-                                Spacer()
-                              ],
-                            ),
-
-                          ),
-                          Container(
-                            width: 25,
-                            height: 25,
-                            margin: EdgeInsets.only(left: 5,right: 5),
-                            padding: EdgeInsets.only(top: 2),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: Colors.grey.shade200,
-                                width: 1,
-                                style: BorderStyle.solid,
-                              ),
-                              color: Colors.grey.shade50,
-                            ),
-                            child: Row(
-                              children: [
-                                Spacer(),
-                                Text('2',style: TextStyle(color: Colors.grey,fontWeight: FontWeight.w400,fontSize:14),),
-                                Spacer()
-                              ],
-                            ),
-
-                          ),
-                          Container(
-                            width: 25,
-                            height: 25,
-                            margin: EdgeInsets.only(left: 5,right: 5),
-                            padding: EdgeInsets.only(top: 2),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: Colors.grey.shade200,
-                                width: 1,
-                                style: BorderStyle.solid,
-                              ),
-                              color: Colors.grey.shade50,
-                            ),
-                            child: Row(
-                              children: [
-                                Spacer(),
-                                Text('3',style: TextStyle(color: Colors.grey,fontWeight: FontWeight.w400,fontSize:14),),
-                                Spacer()
-                              ],
-                            ),
-
-                          ),
-                          Container(
-                            width: 25,
-                            height: 25,
-                            margin: EdgeInsets.only(left: 5,right: 5),
-                            padding: EdgeInsets.only(top: 2),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: Colors.grey.shade200,
-                                width: 1,
-                                style: BorderStyle.solid,
-                              ),
-                              color: Colors.grey.shade50,
-                            ),
-                            child: Row(
-                              children: [
-                                Spacer(),
-                                Icon(FontAwesomeIcons.angleRight,size: 14,color: Colors.grey,),
-                                Spacer()
-                              ],
-                            ),
-
-                          ),
-                          Spacer()
-                        ],
-                      ),
-                    )
+                    }, currentPage: widget.searchModel.page==''?'1':widget.searchModel.page, totalPage: totalPage)
                   ],
                 ),
               ),

@@ -12,7 +12,7 @@ class MBodyAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      flex:2,
+      flex:1,
 
       child: Container(
         padding:const EdgeInsets.only(top: 3,bottom: 3),
@@ -25,15 +25,15 @@ class MBodyAction extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Spacer(),
+            const Spacer(flex: 3,),
             MButtonEdit(onPress: (){
               onEdit();
             }),
-            const Spacer(),
-            MButtonDelete(onConfirmDelete: (){
-              onDelete();
+            const Spacer(flex: 1,),
+            MButtonDelete(onConfirmDelete: (BuildContext context){
+              onDelete(context);
             }),
-            const Spacer(),
+            const Spacer(flex: 3,),
           ],
         ),
       ),

@@ -60,6 +60,8 @@ class MButtonDelete extends StatelessWidget {
                     Container(
                       padding:EdgeInsets.only(left: 50,right: 50,bottom: 50),
                       decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30),bottomRight: Radius.circular(30)),
+
                         color: Colors.white,
                       ),
                       child: Column(
@@ -75,7 +77,7 @@ class MButtonDelete extends StatelessWidget {
                             child: Text('CONFIRM_TO_DELETE_RECORD'.tr(),style: TextStyle(fontWeight: FontWeight.w100,fontSize: 14,),),
                           ),
                           MButton(onPress: (){
-                            onConfirmDelete();
+                            onConfirmDelete(context);
                           }, text: "DELETE", type: ButtonType.negative)
                         ],
                       ),
@@ -92,6 +94,6 @@ class MButtonDelete extends StatelessWidget {
               // ],
             );
           });
-    }, icon: FontAwesomeIcons.trash, color: Colors.red,width: 30,height:30,fontSize:14);
+    }, icon: FontAwesomeIcons.trash, color: Colors.grey,width: 30,height:30,fontSize:14);
   }
 }

@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
+import '../model/basic_validate.dart';
+
 abstract class NumberInputFormatter extends TextInputFormatter {
   TextEditingValue? _lastNewValue;
 
@@ -120,4 +122,5 @@ class ThousandsFormatter extends NumberInputFormatter {
   bool _isUserInput(String s) {
     return s == _decimalSeparator || _decimalRegex.firstMatch(s) != null;
   }
+
 }

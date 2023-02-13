@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class MBodyCell extends StatelessWidget {
   final int flex;
   final Widget child;
-  const MBodyCell({Key? key, required this.flex,required this.child}) : super(key: key);
+   MBodyCell({Key? key, required this.flex,required this.child}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

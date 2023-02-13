@@ -11,6 +11,6 @@ class MButtonEdit extends StatelessWidget {
   Widget build(BuildContext context) {
     return MButtonAction(onPress: (){
       onPress();
-    }, icon: FontAwesomeIcons.pen, color: Colors.orange,width: 30,height: 30,fontSize:14);
+    }, icon: FontAwesomeIcons.pen, color: Colors.blue,width: 30,height: 30,fontSize:14);
   }
 }

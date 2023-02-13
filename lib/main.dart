@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const Category(key: Key('CATEGORY'))
+      home:  Category(key: Key('CATEGORY'))
     );
   }
 }

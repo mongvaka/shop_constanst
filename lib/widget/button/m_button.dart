@@ -15,7 +15,7 @@ class MButton extends StatelessWidget {
     return Container(
       width: double.infinity,
       margin: EdgeInsets.only(top: 40),
-      height: 40,
+      height: 50,
       child: ElevatedButton(onPressed: (){
         onPress();
       },
